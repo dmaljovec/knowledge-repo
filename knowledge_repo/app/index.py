@@ -129,6 +129,7 @@ def index_up_to_date():
 
 @ErrorLog.logged
 def update_index(check_timeouts=True, force=False, reindex=False):
+    updated_posts = []
 
     if not current_app.config['INDEXING_ENABLED']:
         return False
@@ -170,11 +171,13 @@ def update_index(check_timeouts=True, force=False, reindex=False):
                 if post.uuid in kr_uuids:
                     logger.info('Updating location of post: {} -> {}'.format(post.path, kr_uuids[post.uuid].path))
                     post.path = kr_uuids[post.uuid].path
+                    updated_posts.append(post)
 
             # If path of post no longer in directory, mark as unpublished
             if post.path not in kr_dir:
                 logger.info('Recording unpublished status for post at {}'.format(post.path))
                 post.status = current_repo.PostStatus.UNPUBLISHED
+                updated_posts.append(post)
                 continue
 
             # Update database according to current state of existing knowledge post and
@@ -187,6 +190,7 @@ def update_index(check_timeouts=True, force=False, reindex=False):
                 if kp.is_valid():
                     logger.info('Recording update to post at: {}'.format(kp.path))
                     post.update_metadata_from_kp(kp)
+                    updated_posts.append(post)
                 else:
                     logger.warning('Update to post at "{}" is corrupt.'.format(kp.path))
 
@@ -201,6 +205,7 @@ def update_index(check_timeouts=True, force=False, reindex=False):
             db_session.flush()  # (matthew) Fix groups logic so this is not necessary
             post.update_metadata_from_kp(kp)
             send_subscription_emails(post)
+            updated_posts.append(post)
 
         # Record revision
         for uri, revision in current_repo.revisions.items():
@@ -208,3 +213,5 @@ def update_index(check_timeouts=True, force=False, reindex=False):
     finally:
         IndexMetadata.set('lock', 'index', UNLOCKED)
         db_session.commit()
+
+    return updated_posts
