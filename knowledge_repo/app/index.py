@@ -148,6 +148,7 @@ def update_index(check_timeouts=True, force=False, reindex=False):
 
     # Short-circuit if necessary
     if not force and (not is_index_master or index_up_to_date()):
+        logger.info(f"Short-circuiting update: force? {force}, is Master? {is_index_master}, up to date? {index_up_to_date()}")
         return False
 
     try:
