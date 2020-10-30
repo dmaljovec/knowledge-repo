@@ -111,3 +111,6 @@ ENV/
 
 # Mac OS X filesystem artifacts
 .DS_Store
+
+# VS Code artifacts
+.vscode
