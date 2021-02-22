@@ -41,6 +41,7 @@ def set_up_indexing_timers(app):
         def index_sync_loop(app):
             current_app.db.engine.dispose()
             while True:
+                time.sleep(app.config['GIT_SYNC_INTERVAL'])
                 sync_lock.acquire()
                 try:
                     with app.app_context():

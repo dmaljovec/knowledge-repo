@@ -293,6 +293,9 @@ INDEXING_UPDATES_REPOSITORIES_WITHOUT_LOCK = True
 # view the post with a direct link.
 INDEXING_ENABLED = True
 
+# Time between git checks
+GIT_SYNC_INTERVAL = 60  # 1 minute
+
 # ---------------------------------------------------
 # Flask Mail Configuration
 # Refer to https://pythonhosted.org/flask-mail/
